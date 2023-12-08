@@ -1,15 +1,18 @@
 import React, { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import axiosConnection from '../config/axios';
-import { CookiesProvider, useCookies } from "react-cookie";
+import { useCookies } from "react-cookie";
+import { useDispatch, useSelector } from 'react-redux';
+import { loginFailure, loginStart, loginSuccess } from '../redux/user/userSlice';
 
 const SignIn = () => {
 
-    const [loading, setLoading] = useState(false);
     const [alerts, setAlerts] = useState([]);
     const [cookies, setCookie] = useCookies(["user"]);
+    const {loading, error} = useSelector((state) => state.user);
 
     const navegate = useNavigate();
+    const dispatch = useDispatch();
 
     const emailRef = useRef();
     const passwordRef = useRef();
@@ -24,12 +27,15 @@ const SignIn = () => {
         };
 
         try {
+            dispatch(loginStart());
             const {data} = await axiosConnection.post('/api/auth/login',{...dt});
             //generate cookie session
             setCookie("access_token", data.token);
+            dispatch(loginSuccess(data));
             navegate('/')
             
         } catch (error) {
+            dispatch(loginFailure(error.response.data.message));
             setAlerts(error.response.data.message)
         }
 
