@@ -79,7 +79,7 @@ const SignUp = () => {
 
         </form>
 
-        <div className='p-2 gap-2 hidden'>
+        <div className='p-2 flex gap-2'>
             <p>Have an account?</p>
             <Link className='text-blue-700' to="/sign-in">Sign in</Link>
         </div>
