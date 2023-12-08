@@ -1,11 +1,13 @@
 import React, { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import axiosConnection from '../config/axios';
+import { CookiesProvider, useCookies } from "react-cookie";
 
 const SignIn = () => {
 
     const [loading, setLoading] = useState(false);
     const [alerts, setAlerts] = useState([]);
+    const [cookies, setCookie] = useCookies(["user"]);
 
     const navegate = useNavigate();
 
@@ -23,7 +25,9 @@ const SignIn = () => {
 
         try {
             const {data} = await axiosConnection.post('/api/auth/login',{...dt});
-            console.log(data);
+            //generate cookie session
+            setCookie("access_token", data.token);
+            navegate('/')
             
         } catch (error) {
             setAlerts(error.response.data.message)
@@ -72,7 +76,7 @@ const SignIn = () => {
         </form>
 
         <div className='p-2 flex gap-2'>
-            <p>Don't Have an account?</p>
+            <p>Dont  Have an account?</p>
             <Link className='text-blue-700' to="/sign-up">Sign up</Link>
         </div>
 
