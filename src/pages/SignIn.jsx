@@ -4,6 +4,7 @@ import axiosConnection from '../config/axios';
 import { useCookies } from "react-cookie";
 import { useDispatch, useSelector } from 'react-redux';
 import { loginFailure, loginStart, loginSuccess } from '../redux/user/userSlice';
+import { OAuth } from '../components/OAuth';
 
 const SignIn = () => {
 
@@ -75,9 +76,7 @@ const SignIn = () => {
                 {loading ? 'Loading...' : 'Login'}
             </button>
 
-            <button className='w-full bg-red-800 text-white uppercase p-2 rounded-lg hover:opacity-95'>
-                Continue with google
-            </button>
+           <OAuth/>
 
         </form>
 

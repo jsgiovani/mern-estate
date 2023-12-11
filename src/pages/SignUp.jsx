@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axiosConnection from '../config/axios';
+import { OAuth } from '../components/OAuth';
 
 const SignUp = () => {
 
@@ -73,9 +74,7 @@ const SignUp = () => {
                 {loading ? 'Loading...' : 'Register'}
             </button>
 
-            <button className='w-full bg-red-800 text-white uppercase p-2 rounded-lg hover:opacity-95'>
-                Continue with google
-            </button>
+            <OAuth/>
 
         </form>
 
