@@ -16,13 +16,6 @@ const Profile = () => {
     <div className='mx-auto md:max-w-lg'>
         <h1 className='text-3xl font-bold text-slate-800 text-center my-7'>Profile</h1>
 
-        <div className="flex justify-center items-center">
-            <img 
-                className="rounded-full  w-16 h-16 object-cover"
-                src={currentUser.user.photo} 
-                alt="user img"
-            />
-        </div>
 
 
         {alerts && (
@@ -30,6 +23,14 @@ const Profile = () => {
         )}
 
         <form className='px-2 space-y-5' onSubmit={(e) => {handleSubmit(e)}}>
+
+            <div className="flex justify-center items-center">
+                <img 
+                    className="rounded-full  w-24 h-24 object-cover"
+                    src={currentUser.user.photo} 
+                    alt="user img"
+                />
+            </div>
 
             <input 
                 type="text" 
