@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 
 export const OAuth = () => {
     const dispatch = useDispatch();
-    const [cookies, setCookie] = useCookies(["user"]);
     const navegate = useNavigate();
 
     const handleClick = async (e) =>{
@@ -30,8 +29,9 @@ export const OAuth = () => {
             };
 
             const {data:dt} = await axiosConnection.post('/api/auth/google',{...data});
-            setCookie("access_token", dt.token);
+          
             dispatch(loginSuccess(dt))
+            localStorage.setItem('token', dt.token);
             navegate('/')
 
 

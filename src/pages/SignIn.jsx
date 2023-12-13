@@ -30,7 +30,6 @@ const SignIn = () => {
             dispatch(loginStart());
             const {data} = await axiosConnection.post('/api/auth/login',{...dt});
             dispatch(loginSuccess(data));
-            //save token to localstorage
             localStorage.setItem('token', data.token);
             navegate('/');
             

@@ -4,7 +4,9 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/
 import { app } from "../firebase";
 import axiosConnection from "../config/axios";
 import { useCookies } from 'react-cookie';
-import { updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+import { useNavigate } from "react-router-dom";
+
 
 
 const Profile = () => {
@@ -15,6 +17,7 @@ const Profile = () => {
     const [file, setFile ] = useState(undefined);
     const [uploadPorcentage, setUploadPorcentage] = useState();
     const [formData, setFormData] = useState({});
+    const navegate = useNavigate();
 
 
 
@@ -93,6 +96,30 @@ const Profile = () => {
         }
     };
 
+
+    const deleteAccount = async()=>{
+        try {
+            dispatch(deleteUserStart())
+            const {data} = await axiosConnection.delete(`/api/users/${currentUser.user._id}`,{
+                headers:{
+                    'authorization': localStorage.getItem('token'),
+                }
+            });
+
+            if (data.success ==false ) {
+                dispatch(deleteUserFailure(error.message));
+                return;
+            }
+
+            dispatch(deleteUserSuccess(data))
+            localStorage.removeItem('token');
+            navegate('/');
+            
+            
+        } catch (error) {
+            dispatch(deleteUserFailure(error.message))
+        }
+    }
 
 
 
@@ -177,7 +204,7 @@ const Profile = () => {
             {error ? <span className="text-center text-red-700">{console.log(error)}</span> : ''}
 
             <div className="flex justify-between text-red-700 font-semibold">
-                <button>Delete Account</button>
+                <button onClick={deleteAccount}>Delete Account</button>
                 <button>Log out</button>
             </div>
 
