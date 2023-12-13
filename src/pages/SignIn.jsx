@@ -9,7 +9,6 @@ import { OAuth } from '../components/OAuth';
 const SignIn = () => {
 
     const [alerts, setAlerts] = useState([]);
-    const [cookies, setCookie] = useCookies(["user"]);
     const {loading, error} = useSelector((state) => state.user);
 
     const navegate = useNavigate();
@@ -30,10 +29,10 @@ const SignIn = () => {
         try {
             dispatch(loginStart());
             const {data} = await axiosConnection.post('/api/auth/login',{...dt});
-            //generate cookie session
-            setCookie("access_token", data.token);
             dispatch(loginSuccess(data));
-            navegate('/')
+            //save token to localstorage
+            localStorage.setItem('token', data.token);
+            navegate('/');
             
         } catch (error) {
             dispatch(loginFailure(error.response.data.message));
