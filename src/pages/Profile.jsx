@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "../firebase";
 import axiosConnection from "../config/axios";
-import { useCookies } from 'react-cookie';
-import { deleteUserFailure, deleteUserStart, deleteUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, logoutUserFailure, logoutUserStart, logoutUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 
 
@@ -122,6 +121,28 @@ const Profile = () => {
     }
 
 
+    const logout = async() =>{
+
+        try {
+            dispatch(logoutUserStart())
+            const {data} = await axiosConnection.get(`/api/auth/logout`);
+
+            if (data.success ==false ) {
+                dispatch(logoutUserFailure(error.message));
+                return;
+            }
+
+            dispatch(logoutUserSuccess(data));
+            localStorage.removeItem('token');
+            localStorage.removeItem('persist:root');
+            navegate('/login');
+        } catch (error) {
+            dispatch(logoutUserFailure(error.message));
+        }
+        
+    }
+
+
 
   return (
     <div className='mx-auto md:max-w-lg'>
@@ -205,7 +226,7 @@ const Profile = () => {
 
             <div className="flex justify-between text-red-700 font-semibold">
                 <button onClick={deleteAccount}>Delete Account</button>
-                <button>Log out</button>
+                <button onClick={logout}>Log out</button>
             </div>
 
 
