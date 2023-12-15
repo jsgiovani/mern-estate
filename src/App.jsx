@@ -6,6 +6,7 @@ import SignIn from "./pages/SignIn"
 import SignUp from "./pages/SignUp"
 import Header from "./components/Header"
 import PrivateRoute from "./components/PrivateRoute"
+import Create from "./pages/property/Create"
 
 function App() {
 
@@ -20,6 +21,9 @@ function App() {
         <Route element = {<PrivateRoute/>}>
           <Route path="/profile" element = {<Profile/>}/>
         </Route>
+
+
+        <Route path="/properties/create" element = {<Create/>}/>
 
     </Routes>
 

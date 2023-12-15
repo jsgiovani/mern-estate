@@ -4,7 +4,7 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/
 import { app } from "../firebase";
 import axiosConnection from "../config/axios";
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, logoutUserFailure, logoutUserStart, logoutUserSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from "../redux/user/userSlice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 
@@ -214,12 +214,13 @@ const Profile = () => {
             </button>
 
 
-            <button 
-                className='w-full bg-green-700 text-white uppercase p-2 rounded-lg hover:opacity-95'
+            <Link 
+                to={'/properties/create'}
+                className='w-full bg-green-700 text-white uppercase p-2 rounded-lg hover:opacity-95 block text-center'
                 type='button'
             >
                 Create Listing
-            </button>
+            </Link>
 
 
             {error ? <span className="text-center text-red-700">{console.log(error)}</span> : ''}
