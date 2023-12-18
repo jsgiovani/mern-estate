@@ -1,6 +1,96 @@
-import React from 'react'
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useEffect, useState } from 'react'
+import { app } from '../../firebase';
 
 const Create = () => {
+
+    const [files, setFiles] = useState([]);
+    const [alert, setAlert] = useState();
+    const [isLoading, setIsLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        images:[]
+    })
+
+    console.log(formData);
+
+
+    //fn to upload multiples images to firebase
+    const handleImageSubmit = (e) =>{
+        e.preventDefault();
+
+        //verify if files exists and if is less than 6
+        if (files.length>0 && (files.length + formData.images.length) < 7) {
+            setIsLoading(true);
+            const promises = [];
+
+            for (let i = 0; i < files.length; i++) {
+                promises.push(uploadImage(files[i]));
+            }
+
+            Promise.all(promises).then((urls) =>{
+                setFormData({...formData, images:formData.images.concat(urls)});
+                setAlert(null);
+                setIsLoading(false);
+            }).catch((error) => {
+                setAlert('Each image must be max: 2MB');
+                setIsLoading(false);
+            });
+
+
+            
+        }else{
+            setAlert('You can upload max 6 images');
+            setIsLoading(false);
+
+        }
+
+        e.target=null;
+
+    }
+
+
+    //fn to upload image
+    const uploadImage = async (file)=>{
+
+        return new Promise((resolve, reject) => {
+            const storage = getStorage(app);
+            const fileName = new Date().getTime() + file.name;
+            const storeRef = ref(storage, fileName);
+            const uploadFile = uploadBytesResumable(storeRef, file);
+    
+            uploadFile.on('state_changed', 
+            
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                },
+    
+                (error) =>  {
+                    reject(error);
+                    setAlert('Image must be max: 2MB');
+                },
+    
+                ()=>{
+                    getDownloadURL(uploadFile.snapshot.ref).then((downloadURL) =>{
+                        resolve(downloadURL);
+                        setAlert(null);
+                    })
+                }
+            );
+
+        });
+
+
+    }
+
+
+    const removeImage = (img) =>{
+        const fdImages = formData.images.filter(item => item!=img);
+        setFormData({...formData, images:fdImages});
+    }
+
+
+
+
   return (
     <main className='mx-auto md:max-w-4xl'>
         <h1 className='text-center text-3xl my-7 font-semibold'>Add a Property</h1>
@@ -169,11 +259,36 @@ const Create = () => {
                         multiple
                         accept='image/*'
                         className='border border-gray-700 p-2 flex-1 rounded-md'
+                        onChange={(e) => {setFiles(e.target.files)}}
+
                      
                     />
 
-                    <button className='border border-green-800 p-2 rounded-md text-green-700 font-semibold uppercase'>Upload</button>
+                    <button 
+                        onClick={(e) => {handleImageSubmit(e)}}
+                        type='button'
+                        disabled = {isLoading} 
+                        className='border border-green-800 p-2 rounded-md text-green-700 font-semibold uppercase'
+                    >
+                        {isLoading ? 'Uploading...': 'Upload'}
+                    </button>
+
                 </div>
+                
+                {alert && <p className='text-sm text-red-700'>{alert}</p>}
+
+                {formData.images.length>0 && (
+                    <ul className='space-y-2'>
+                       {formData.images.map((img => {
+                            return(
+                                <li key={img} className='flex justify-between items-center gap-2 border p-2 rounded-lg'>
+                                    <img src={img} alt="img" className='w-24 h-20 object-fit rounded-lg' />
+                                    <button onClick={()=>{removeImage(img)}} className='text-red-700 hover:opacity-90 uppercase text-sm'>Remove</button>
+                                </li>
+                            );
+                       }))}
+                    </ul>
+                )}
 
                 <button 
                     className='w-full bg-slate-700 text-white uppercase p-2 rounded-lg hover:opacity-95'
