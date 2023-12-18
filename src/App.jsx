@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp"
 import Header from "./components/Header"
 import PrivateRoute from "./components/PrivateRoute"
 import Create from "./pages/property/Create"
+import Properties from "./pages/property/Properties"
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
 
 
         <Route path="/properties/create" element = {<Create/>}/>
+        <Route path="/properties/:id" element = {<Properties/>}/>
 
     </Routes>
 

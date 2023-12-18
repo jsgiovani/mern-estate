@@ -1,17 +1,58 @@
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { app } from '../../firebase';
+import { useSelector } from 'react-redux';
+import axiosConnection from '../../config/axios';
+import { useNavigate } from 'react-router-dom';
 
 const Create = () => {
+
+    const {currentUser} = useSelector((state) => state.user);
 
     const [files, setFiles] = useState([]);
     const [alert, setAlert] = useState();
     const [isLoading, setIsLoading] = useState(false);
+    const [crateAlert, setCrateAlert] = useState();
+    const [createError, setCreateError] = useState();
+    const navegate = useNavigate();
     const [formData, setFormData] = useState({
-        images:[]
+        imageUrls:[],
+        furnished:false,
+        offer:false,
+        parking:false,
+        type: 'sale',
+        name:'',
+        description:'',
+        address:'',
+        regularPrice:0,
+        discountPrice:0,
+        bedrooms:1,
+        bathrooms:1,        
     })
 
-    console.log(formData);
+
+    const handleChange = (e)=>{
+        setFormData({
+            ...formData,
+            [e.target.id]:e.target.value
+        });
+    }
+
+    const handleType = (e)=> {
+        setFormData({
+            ...formData, type:[e.target.id][0]
+        });
+    }
+
+
+    const handleChecked = (e)=> {
+        setFormData({
+            ...formData, [e.target.id]:e.target.checked
+        });
+    }
+
+
+
 
 
     //fn to upload multiples images to firebase
@@ -19,7 +60,7 @@ const Create = () => {
         e.preventDefault();
 
         //verify if files exists and if is less than 6
-        if (files.length>0 && (files.length + formData.images.length) < 7) {
+        if (files.length>0 && (files.length + formData.imageUrls.length) < 7) {
             setIsLoading(true);
             const promises = [];
 
@@ -28,12 +69,13 @@ const Create = () => {
             }
 
             Promise.all(promises).then((urls) =>{
-                setFormData({...formData, images:formData.images.concat(urls)});
-                setAlert(null);
+                setFormData({...formData, imageUrls:formData.imageUrls.concat(urls)});
+                setCreateError(null);
                 setIsLoading(false);
             }).catch((error) => {
                 setAlert('Each image must be max: 2MB');
                 setIsLoading(false);
+                setCrateAlert(null);
             });
 
 
@@ -41,12 +83,40 @@ const Create = () => {
         }else{
             setAlert('You can upload max 6 images');
             setIsLoading(false);
+            setCrateAlert(null);
 
         }
 
-        e.target=null;
-
     }
+
+
+
+    //submit form
+
+    const handleSubmit = async(e)=>{
+        e.preventDefault();
+        try {
+            if (formData.imageUrls.length<1) {
+                return setCreateError('You moust opload at least one image');
+            }
+
+            if (formData.offer && +formData.regularPrice < +formData.discountPrice) {
+                return setCreateError('Discount price must be less than regular price');
+            }
+
+            setIsLoading(true);
+            axiosConnection.post('/api/properties', {...formData, userRef:currentUser.user._id });
+            setAlert(null);
+            setIsLoading(false);
+            setCrateAlert('Propierty added successfully');
+            setCreateError(null);
+            navegate(`/properties/${currentUser.user._id}`);
+        } catch (error) {
+            setCreateError(error.message);
+            setIsLoading(false);
+            setCrateAlert(null);
+        }
+    } 
 
 
     //fn to upload image
@@ -84,9 +154,12 @@ const Create = () => {
 
 
     const removeImage = (img) =>{
-        const fdImages = formData.images.filter(item => item!=img);
-        setFormData({...formData, images:fdImages});
+        const fdImages = formData.imageUrls.filter(item => item!=img);
+        setFormData({...formData, imageUrls:fdImages});
     }
+
+
+
 
 
 
@@ -95,7 +168,7 @@ const Create = () => {
     <main className='mx-auto md:max-w-4xl'>
         <h1 className='text-center text-3xl my-7 font-semibold'>Add a Property</h1>
 
-        <form className='px-2 space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4'>
+        <form className='px-2 space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4' onSubmit={(e) => {handleSubmit(e)}}>
 
             <div className='space-y-4 md:flex-1'>
                 <input 
@@ -103,7 +176,8 @@ const Create = () => {
                     id="name" 
                     placeholder='Name'
                     className='bg-white w-full p-2 border rounded-md'
-                    required 
+                    required
+                    onChange={(e) =>{handleChange(e)}} 
                 />
 
 
@@ -113,6 +187,7 @@ const Create = () => {
                     rows="5"
                     className='bg-white w-full p-2 border rounded-md resize-none'
                     placeholder='Description'
+                    onChange={(e) =>{handleChange(e)}}
                 ></textarea>
 
 
@@ -122,7 +197,8 @@ const Create = () => {
                     id="address" 
                     placeholder='Address'
                     className='bg-white w-full p-2 border rounded-md'
-                    required 
+                    required
+                    onChange={(e) =>{handleChange(e)}} 
                 />
 
 
@@ -132,6 +208,8 @@ const Create = () => {
                         <input 
                             type="checkbox" 
                             id="sale" 
+                            checked = {formData.type ==='sale'}
+                            onChange={(e) =>{handleType(e)}}
                         />
                         <label className='text-sm' htmlFor="sale">Sell</label>
                     </div>
@@ -139,6 +217,8 @@ const Create = () => {
                     <div className='flex gap-2'>
                         <input 
                             type="checkbox" 
+                            checked = {formData.type ==='rent'}
+                            onChange={(e) =>{handleType(e)}}
                             id="rent" 
                         />
                         <label className='text-sm' htmlFor="rent">Rent</label>
@@ -147,7 +227,9 @@ const Create = () => {
                     <div className='flex gap-2'>
                         <input 
                             type="checkbox" 
-                            id="parking" 
+                            id="parking"
+                            checked = {formData.parking}
+                            onChange={(e) =>{handleChecked(e)}} 
                         />
                         <label className='text-sm' htmlFor="parking">Parking spot</label>
                     </div>
@@ -156,7 +238,9 @@ const Create = () => {
                     <div className='flex gap-2'>
                         <input 
                             type="checkbox" 
-                            id="furnished" 
+                            id="furnished"
+                            checked = {formData.furnished}
+                            onChange={(e) =>{handleChecked(e)}}
                         />
                         <label className='text-sm' htmlFor="furnished">Furnished</label>
                     </div>
@@ -164,7 +248,9 @@ const Create = () => {
                     <div className='flex gap-2'>
                         <input 
                             type="checkbox" 
-                            id="offer" 
+                            id="offer"
+                            checked = {formData.offer}
+                            onChange={(e) =>{handleChecked(e)}} 
                         />
                         <label className='text-sm' htmlFor="offer">Offer</label>
                     </div>
@@ -183,12 +269,13 @@ const Create = () => {
                         <input 
                             type="number" 
                             className='bg-white p-2 border rounded-md w-20' 
-                            id="beds"
+                            id="bedrooms"
                             min={1} 
                             defaultValue={1}
+                            onChange={(e) =>{handleChange(e)}}
                         />
 
-                        <label htmlFor="beds">Beds</label>
+                        <label htmlFor="bedrooms">Beds</label>
 
                     </div>
 
@@ -198,12 +285,13 @@ const Create = () => {
                         <input 
                             type="number" 
                             className='bg-white p-2 border rounded-md w-20' 
-                            id="baths"
+                            id="bathrooms"
                             min={1} 
                             defaultValue={1}
+                            onChange={(e) =>{handleChange(e)}}
                         />
 
-                        <label htmlFor="baths">Baths</label>
+                        <label htmlFor="bathrooms">Baths</label>
 
                     </div>
 
@@ -219,31 +307,36 @@ const Create = () => {
                             id="regularPrice"
                             min={0} 
                             defaultValue={0}
+                            onChange={(e) =>{handleChange(e)}}
                         />
 
-                        <label className='text-sm' htmlFor="regularPrice">Regular price ($/Month)</label>
+                        <label className='text-sm' htmlFor="regularPrice"> Regular Price {formData.type =='rent' ? "($/Month)":""}</label>
 
                     </div>
 
                 </div>
 
-                <div className='flex gap-10'>
-                    <div className='flex gap-2 items-center'>
+                {formData.offer && (
+                    <div className='flex gap-10'>
+                        <div className='flex gap-2 items-center'>
 
 
-                        <input 
-                            type="number" 
-                            className='bg-white p-2 border rounded-md w-20' 
-                            id="discountPrice"
-                            min={0} 
-                            defaultValue={0}
-                        />
+                            <input 
+                                type="number" 
+                                className='bg-white p-2 border rounded-md w-20' 
+                                id="discountPrice"
+                                min={0} 
+                                defaultValue={0}
+                                onChange={(e) =>{handleChange(e)}}
+                            />
 
-                        <label className='text-sm' htmlFor="discountPrice">Discount price ($/Month)</label>
+                            <label className='text-sm' htmlFor="discountPrice">Discount price {formData.type =='rent' ? "($/Month)":""}</label>
+
+                        </div>
 
                     </div>
+                )}
 
-                </div>
 
             </div>
 
@@ -277,12 +370,12 @@ const Create = () => {
                 
                 {alert && <p className='text-sm text-red-700'>{alert}</p>}
 
-                {formData.images.length>0 && (
+                {formData.imageUrls.length>0 && (
                     <ul className='space-y-2'>
-                       {formData.images.map((img => {
+                       {formData.imageUrls.map((img => {
                             return(
                                 <li key={img} className='flex justify-between items-center gap-2 border p-2 rounded-lg'>
-                                    <img src={img} alt="img" className='w-24 h-20 object-fit rounded-lg' />
+                                    <img src={img} alt="img" className='w-20 h-20 object-fit rounded-lg' />
                                     <button onClick={()=>{removeImage(img)}} className='text-red-700 hover:opacity-90 uppercase text-sm'>Remove</button>
                                 </li>
                             );
@@ -291,12 +384,18 @@ const Create = () => {
                 )}
 
                 <button 
+                    disabled = {isLoading} 
                     className='w-full bg-slate-700 text-white uppercase p-2 rounded-lg hover:opacity-95'
                     type="submit"
                 >
-                    Add property
+                     {isLoading ? 'Creating...': 'Create'}
                 </button>
+                
+                <p className='text-center font-bold text-green-800'>{crateAlert}</p>
+                <p className='text-center font-bold text-red-800'>{createError}</p>
             </div>
+
+
 
 
             
