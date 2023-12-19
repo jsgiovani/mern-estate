@@ -16,6 +16,8 @@ const Profile = () => {
     const [file, setFile ] = useState(undefined);
     const [uploadPorcentage, setUploadPorcentage] = useState();
     const [formData, setFormData] = useState({});
+    const [showPropertiesError, setShowPropertiesError] = useState();
+    const [properties, setProperties] = useState([]);
     const navegate = useNavigate();
 
 
@@ -143,6 +145,17 @@ const Profile = () => {
     }
 
 
+    //fn to show all user properties
+    const handleShowProperties = async()=>{
+        try {
+            const {data} = await axiosConnection.get(`/api/users/properties/${currentUser.user._id}`);
+            setProperties(data);
+        } catch (error) {
+            setShowPropertiesError(error.message);
+        }
+    }
+
+
 
   return (
     <div className='mx-auto md:max-w-lg'>
@@ -232,6 +245,38 @@ const Profile = () => {
 
 
         </form>
+
+
+        <button onClick={handleShowProperties} className="text-center w-full my-4 text-gray-700">Show Properties</button>
+
+        {properties.length>0 && (
+            <ul className="space-y-2">
+                <h2 className="text-center text-2xl font-bold mb-4">Your listing</h2>
+                {
+                    properties.map((property) =>{
+                        const {_id, name, imageUrls} = property;
+                        return (
+                            <li key={_id} className="border p-3 flex items-center justify-between rounded-md">
+                                <Link to = "#" className="flex items-center gap-2">
+                                    <img className="w-12" src={imageUrls[0]} alt='img property' />
+                                    <h3 className="hover:underline font-semibold truncate">{name}</h3>
+                                </Link>
+
+                                <div className="flex flex-col items-start">
+                                    <button className='text-red-700 hover:opacity-90 uppercase text-sm'>Delete</button>
+                                    <button className='text-green-700 hover:opacity-90 uppercase text-sm'>Edit</button>
+                                </div>
+                            </li>
+                        );
+                    })
+
+                }
+            </ul>
+        )
+         
+        }
+
+
 
 
 
