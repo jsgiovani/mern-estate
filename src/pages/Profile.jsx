@@ -284,7 +284,7 @@ const Profile = () => {
 
                                 <div className="flex flex-col items-start">
                                     <button onClick={()=>{handleDeleteProperty(_id)}} className='text-red-700 hover:opacity-90 uppercase text-sm'>Delete</button>
-                                    <button className='text-green-700 hover:opacity-90 uppercase text-sm'>Edit</button>
+                                    <Link to={`/properties/${_id}/update`} className='text-green-700 hover:opacity-90 uppercase text-sm'>Edit</Link>
                                 </div>
                             </li>
                         );

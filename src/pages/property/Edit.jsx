@@ -3,9 +3,13 @@ import React, { useState } from 'react'
 import { app } from '../../firebase';
 import { useSelector } from 'react-redux';
 import axiosConnection from '../../config/axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
-const Create = () => {
+const Edit = () => {
+
+    const {id} = useParams();
+
 
     const {currentUser} = useSelector((state) => state.user);
 
@@ -15,6 +19,7 @@ const Create = () => {
     const [crateAlert, setCrateAlert] = useState();
     const [createError, setCreateError] = useState();
     const navegate = useNavigate();
+
     const [formData, setFormData] = useState({
         imageUrls:[],
         furnished:false,
@@ -24,7 +29,6 @@ const Create = () => {
         name:'',
         description:'',
         address:'',
-        regularPrice:0,
         discountPrice:0,
         bedrooms:1,
         bathrooms:1,        
@@ -52,6 +56,30 @@ const Create = () => {
     }
 
 
+    const fetchProperty = async (id) =>{
+
+        try {
+           setIsLoading(true);
+
+            const {data} = await axiosConnection.get(`/api/properties/${id}`,{
+                headers:{
+                    'authorization': localStorage.getItem('token'),
+                }
+            });
+            
+            setFormData({...data})
+            setIsLoading(false)
+
+        } catch (error) {
+            console.log(error.message);
+        }
+
+    }
+
+
+    useEffect(() => {
+        fetchProperty(id);
+    }, [])
 
 
 
@@ -105,14 +133,14 @@ const Create = () => {
             }
 
             setIsLoading(true);
-            axiosConnection.post('/api/properties', {...formData, userRef:currentUser.user._id }, {
+            axiosConnection.put(`/api/properties/${id}`, {...formData, userRef:currentUser.user._id }, {
                 headers:{
                     'authorization': localStorage.getItem('token'),
                 }
             });
             setAlert(null);
             setIsLoading(false);
-            setCrateAlert('Propierty added successfully');
+            setCrateAlert('Propierty updated successfully');
             setCreateError(null);
             navegate(`/properties/${currentUser.user._id}`);
         } catch (error) {
@@ -166,7 +194,7 @@ const Create = () => {
 
   return (
     <main className='mx-auto md:max-w-4xl'>
-        <h1 className='text-center text-3xl my-7 font-semibold'>Add a Property</h1>
+        <h1 className='text-center text-3xl my-7 font-semibold'>Update Property</h1>
 
         <form className='px-2 space-y-4 md:space-y-0 md:grid md:grid-cols-2 md:gap-4' onSubmit={(e) => {handleSubmit(e)}}>
 
@@ -177,7 +205,8 @@ const Create = () => {
                     placeholder='Name'
                     className='bg-white w-full p-2 border rounded-md'
                     required
-                    onChange={(e) =>{handleChange(e)}} 
+                    onChange={(e) =>{handleChange(e)}}
+                    defaultValue={formData.name} 
                 />
 
 
@@ -188,6 +217,7 @@ const Create = () => {
                     className='bg-white w-full p-2 border rounded-md resize-none'
                     placeholder='Description'
                     onChange={(e) =>{handleChange(e)}}
+                    defaultValue={formData.description} 
                 ></textarea>
 
 
@@ -199,6 +229,7 @@ const Create = () => {
                     className='bg-white w-full p-2 border rounded-md'
                     required
                     onChange={(e) =>{handleChange(e)}} 
+                    defaultValue={formData.address} 
                 />
 
 
@@ -271,7 +302,7 @@ const Create = () => {
                             className='bg-white p-2 border rounded-md w-20' 
                             id="bedrooms"
                             min={1} 
-                            defaultValue={1}
+                            defaultValue={formData.bedrooms} 
                             onChange={(e) =>{handleChange(e)}}
                         />
 
@@ -287,7 +318,7 @@ const Create = () => {
                             className='bg-white p-2 border rounded-md w-20' 
                             id="bathrooms"
                             min={1} 
-                            defaultValue={1}
+                            defaultValue={formData.bathrooms} 
                             onChange={(e) =>{handleChange(e)}}
                         />
 
@@ -306,7 +337,7 @@ const Create = () => {
                             className='bg-white p-2 border rounded-md w-20' 
                             id="regularPrice"
                             min={0} 
-                            defaultValue={0}
+                            defaultValue={formData.regularPrice} 
                             onChange={(e) =>{handleChange(e)}}
                         />
 
@@ -326,7 +357,7 @@ const Create = () => {
                                 className='bg-white p-2 border rounded-md w-20' 
                                 id="discountPrice"
                                 min={0} 
-                                defaultValue={0}
+                                defaultValue={formData.discountPrice} 
                                 onChange={(e) =>{handleChange(e)}}
                             />
 
@@ -388,7 +419,7 @@ const Create = () => {
                     className='w-full bg-slate-700 text-white uppercase p-2 rounded-lg hover:opacity-95'
                     type="submit"
                 >
-                     {isLoading ? 'Creating...': 'Create'}
+                     {isLoading ? 'Updating...': 'Update'}
                 </button>
                 
                 <p className='text-center font-bold text-green-800'>{crateAlert}</p>
@@ -404,4 +435,4 @@ const Create = () => {
   )
 }
 
-export default Create
+export default Edit
