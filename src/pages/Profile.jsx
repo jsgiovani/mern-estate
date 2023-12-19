@@ -157,6 +157,26 @@ const Profile = () => {
 
 
 
+    //fn to delete property
+    const handleDeleteProperty = async(id) =>{
+
+        try {
+            const {data} = await axiosConnection.delete(`/api/properties/${id}`,{
+                headers:{
+                    'authorization': localStorage.getItem('token'),
+                }
+            });
+
+            setProperties((prev) => prev.filter((item) => item._id !==id));
+
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+
+
   return (
     <div className='mx-auto md:max-w-lg'>
 
@@ -263,7 +283,7 @@ const Profile = () => {
                                 </Link>
 
                                 <div className="flex flex-col items-start">
-                                    <button className='text-red-700 hover:opacity-90 uppercase text-sm'>Delete</button>
+                                    <button onClick={()=>{handleDeleteProperty(_id)}} className='text-red-700 hover:opacity-90 uppercase text-sm'>Delete</button>
                                     <button className='text-green-700 hover:opacity-90 uppercase text-sm'>Edit</button>
                                 </div>
                             </li>
