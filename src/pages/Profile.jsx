@@ -277,7 +277,7 @@ const Profile = () => {
                         const {_id, name, imageUrls} = property;
                         return (
                             <li key={_id} className="border p-3 flex items-center justify-between rounded-md">
-                                <Link to = "#" className="flex items-center gap-2">
+                                <Link to={`/properties/${_id}`} className="flex items-center gap-2">
                                     <img className="w-12" src={imageUrls[0]} alt='img property' />
                                     <h3 className="hover:underline font-semibold truncate">{name}</h3>
                                 </Link>

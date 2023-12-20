@@ -9,6 +9,7 @@ import PrivateRoute from "./components/PrivateRoute"
 import Create from "./pages/property/Create"
 import Properties from "./pages/property/Properties"
 import Edit from "./pages/property/Edit"
+import Property from "./pages/property/Property"
 
 function App() {
 
@@ -22,14 +23,16 @@ function App() {
 
         <Route element = {<PrivateRoute/>}>
           <Route path="/profile" element = {<Profile/>}/>
+          <Route path="/properties/create" element = {<Create/>}/>
+          <Route path="/properties/:id/update" element = {<Edit/>}/>
         </Route>
 
-
-        <Route path="/properties/create" element = {<Create/>}/>
-        <Route path="/properties/:id" element = {<Properties/>}/>
-        <Route path="/properties/:id/update" element = {<Edit/>}/>
-
+        <Route path="/properties/:id" element = {<Property/>}/>
     </Routes>
+
+
+
+
 
   </BrowserRouter>
 }

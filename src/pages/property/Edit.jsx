@@ -142,7 +142,7 @@ const Edit = () => {
             setIsLoading(false);
             setCrateAlert('Propierty updated successfully');
             setCreateError(null);
-            navegate(`/properties/${currentUser.user._id}`);
+            navegate(`/properties/${id}`);
         } catch (error) {
             setCreateError(error.message);
             setIsLoading(false);
