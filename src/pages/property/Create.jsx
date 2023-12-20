@@ -3,11 +3,12 @@ import React, { useState } from 'react'
 import { app } from '../../firebase';
 import { useSelector } from 'react-redux';
 import axiosConnection from '../../config/axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Create = () => {
 
     const {currentUser} = useSelector((state) => state.user);
+    const {id} = useParams();
 
     const [files, setFiles] = useState([]);
     const [alert, setAlert] = useState();
@@ -105,7 +106,7 @@ const Create = () => {
             }
 
             setIsLoading(true);
-            axiosConnection.post('/api/properties', {...formData, userRef:currentUser.user._id }, {
+            const {data} = await axiosConnection.post('/api/properties', {...formData, userRef:currentUser.user._id }, {
                 headers:{
                     'authorization': localStorage.getItem('token'),
                 }
@@ -114,7 +115,7 @@ const Create = () => {
             setIsLoading(false);
             setCrateAlert('Propierty added successfully');
             setCreateError(null);
-            navegate(`/properties/${id}`);
+            navegate(`/properties/${data._id}`);
         } catch (error) {
             setCreateError(error.message);
             setIsLoading(false);
