@@ -48,7 +48,7 @@ const Contact = ({property}) => {
                 ></textarea>
 
                 <button className='bg-green-800 py-2 px-8 text-white font-semibold rounded-lg text-sm mt-4 w-full md:w-auto'>
-                    Send
+                    Send message
                 </button>
 
             </div>
