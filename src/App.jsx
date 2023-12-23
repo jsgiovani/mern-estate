@@ -10,6 +10,7 @@ import Create from "./pages/property/Create"
 import Properties from "./pages/property/Properties"
 import Edit from "./pages/property/Edit"
 import Property from "./pages/property/Property"
+import Search from "./components/Search"
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/about" element = {<About/>}/>
         <Route path="/sign-in" element = {<SignIn/>}/>
         <Route path="/sign-up" element = {<SignUp/>}/>
+        <Route path="/search" element = {<Search/>}/>
 
         <Route element = {<PrivateRoute/>}>
           <Route path="/profile" element = {<Profile/>}/>
