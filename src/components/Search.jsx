@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import axiosConnection from "../config/axios";
+import PropertyCard from "./PropertyCard";
 
 const Search = () => {
 
@@ -23,8 +24,9 @@ const Search = () => {
             setLoading(true);
             const urlParams = new URLSearchParams(location.search);
             const {data} = await axiosConnection.get(`/api/search?${urlParams.toString()}`);
-            setProperties(...data);
+            setProperties(data);
             setLoading(false);
+            console.log(data);
         } catch (error) {
             console.log(error);
         }
@@ -108,9 +110,9 @@ const Search = () => {
 
 
   return (
-    <main className='md:mx-auto md:flex'>
+    <main className='md:max-w-7xl md:mx-auto md:flex'>
         <aside>
-            <form className='flex flex-row gap-5 flex-wrap py-10 px-2 md:max-w-sm border-b-2 md:border-none' onSubmit={handleSubmit}>
+            <form className='flex flex-row gap-5 flex-wrap py-10 px-2 md:max-w-md border-b-2 md:border-none' onSubmit={handleSubmit}>
 
                 <div className='flex gap-1 items-center w-full'>
                     <input 
@@ -215,6 +217,26 @@ const Search = () => {
 
         <div className='py-10 px-2 md:border-l-2 md:h-screen'>
             <h1 className='text-2xl font-semibold'>Results</h1>
+
+            <div>
+                {!loading && properties.length==0 && (
+                    <p>No items found</p>
+                )}
+            </div>
+
+            {loading && (
+                <p>Loading...</p>
+            )}
+
+        
+            <ul className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 gap-4 mt-2">
+              {!loading && properties.map((property => {
+                return(
+                    <PropertyCard key={property._id} property = {property}/>
+                );
+              }))}
+            </ul>
+
 
             
         </div>

@@ -33,7 +33,7 @@ const Header = () => {
   return (
     <header className="bg-slate-200 shadow-md">
 
-        <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
+        <div className="flex justify-between items-center max-w-7xl mx-auto p-3">
 
             <Link to='/' className="font-bold md:text-xl">
                 <span className="text-slate-500 md:text-xl">Real</span>

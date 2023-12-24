@@ -96,11 +96,11 @@ const Property = () => {
 
 
         <div className='px-2 md:max-w-6xl md:mx-auto'>
-            <h1 className='font-bold text-3xl my-10'>{property.name} - ${property.offer ? property.discountPrice : property.regularPrice} {property.type ==='rent' ? '/month': ''} </h1>
+            <h1 className='font-bold text-3xl my-10'>{property.name} - ${property.offer ? property.regularPrice - property.discountPrice : property.regularPrice} {property.type ==='rent' ? '/month': ''} </h1>
             <div className='flex gap-2 items-center my-10'>
                 <span className='bg-red-800 py-1 px-5 text-white font-semibold rounded-lg text-sm'>{property.type ==='rent' ? 'For Rent': 'For Sale'}</span>
                 {property.offer && (
-                    <span className='bg-green-800 py-1 px-5 text-white font-semibold rounded-lg text-sm'>${property.regularPrice - property.discountPrice} discount</span>
+                    <span className='bg-green-800 py-1 px-5 text-white font-semibold rounded-lg text-sm'>${property.discountPrice} discount</span>
                 )}
             </div>
 
