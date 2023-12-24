@@ -37,6 +37,7 @@ const Property = () => {
             const request = await axiosConnection.get(`/api/properties/${id}`);
 
             setProperty({...request.data});
+        
             setIsLoading(false);
 
         } catch (error) {
@@ -45,6 +46,7 @@ const Property = () => {
     }
 
 
+    console.log(property);
 
     useEffect(() => {
         fetchProperty(id);

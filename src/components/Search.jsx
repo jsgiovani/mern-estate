@@ -8,6 +8,7 @@ const Search = () => {
     const navegate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [properties, setProperties] = useState([]);
+    const [showMore, setShowMore] = useState(false);
 
     const [sidebarData, setSidebarData] = useState({
         item:'',
@@ -25,13 +26,36 @@ const Search = () => {
             const urlParams = new URLSearchParams(location.search);
             const {data} = await axiosConnection.get(`/api/search?${urlParams.toString()}`);
             setProperties(data);
+
+            if (data.length>2) {
+                setShowMore(true);
+            }
+            
             setLoading(false);
-            console.log(data);
         } catch (error) {
             console.log(error);
         }
     }
 
+    const onShowMoreClick = async()=>{
+        const numberOfProperties = properties.length;
+        const startIndex = parseInt(numberOfProperties);
+        const urlPramas = new URLSearchParams(location.search);
+        urlPramas.set('startIndex', startIndex);
+        const searchQuery = urlPramas.toString();
+
+        try {
+            setLoading(true);
+            const {data} = await axiosConnection.get(`/api/search?${searchQuery}`);
+            if (data.length<3) {
+                setShowMore(false);
+            }
+            setProperties([...properties, ...data]);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
@@ -236,6 +260,13 @@ const Search = () => {
                 );
               }))}
             </ul>
+
+            {
+                showMore && (
+                    <button className="mt-5 text-green-700  hover:underline w-full" onClick={onShowMoreClick}>Show More</button>
+                )
+            }
+
 
 
             
