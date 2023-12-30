@@ -127,14 +127,8 @@ const Profile = () => {
 
         try {
             dispatch(logoutUserStart())
-            const {data} = await axiosConnection.get(`/api/auth/logout`);
-
-            if (data.success ==false ) {
-                dispatch(logoutUserFailure(error.message));
-                return;
-            }
-
-            dispatch(logoutUserSuccess(data));
+            await axiosConnection.get(`/api/auth/logout`);
+            dispatch(logoutUserSuccess(null));
             localStorage.removeItem('token');
             localStorage.removeItem('persist:root');
             navegate('/login');
@@ -190,6 +184,7 @@ const Profile = () => {
                 className="hidden" 
                 type="file" 
                 accept="image/png, image/jpeg"
+                ref={fileRef}
                 onChange={(e) => {setFile(e.target.files[0])}}  
             />
 
@@ -231,7 +226,7 @@ const Profile = () => {
 
             <input 
                 type="password" 
-                placeholder='Password'
+                placeholder='New password'
                 className='bg-white w-full p-2 border rounded-md'
                 id="password"
                 onChange={(e) => {handleChange(e)}}

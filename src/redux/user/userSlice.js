@@ -65,12 +65,7 @@ const userSlice =  createSlice({
         logoutUserFailure:(state, action) =>{
             state.error = action.payload;
             state.loading = false;
-
         },
-
-
-
-
 
     }
 });
